@@ -1,0 +1,2 @@
+include ':app', ':kpref'
+rootProject.name='KPrefExample'
