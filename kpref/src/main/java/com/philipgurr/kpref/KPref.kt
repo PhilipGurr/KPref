@@ -31,6 +31,12 @@ class SharedPreference<T : Any>(private val name: String, private val default: T
     private val gson = Gson()
     private val clazz: KClass<out T> = default::class
 
+    /**
+     * Uses the name as key and the block for building the default object.
+     *
+     * @param name The key for the preference.
+     * @param block A function generating the default value.
+     */
     constructor(name: String, block: () -> T) : this(name, block())
 
     /**
