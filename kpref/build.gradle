@@ -1,6 +1,48 @@
+buildscript {
+    repositories {
+        jcenter()
+    }
+    dependencies {
+        classpath 'com.github.dcendents:android-maven-gradle-plugin:1.4.1'
+        classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.7.3'
+        classpath "org.jetbrains.dokka:dokka-android-gradle-plugin:0.9.18"
+    }
+}
+
+ext {
+    bintrayRepo = 'maven'
+    bintrayName = 'kpref'
+
+    publishedGroupId = 'com.philipgurr.android'
+    libraryName = 'KPref'
+    artifact = 'kpref'
+
+    libraryDescription = 'A Kotlin library for Android Shared Preferences.'
+
+    siteUrl = 'https://github.com/PhilipGurr/KPref'
+    gitUrl = 'https://github.com/PhilipGurr/KPref.git'
+
+    libraryVersion = '1.0.0'
+
+    developerId = 'philipgurr'
+    developerName = 'Philip Gurr'
+    developerEmail = 'philipgurr10@gmail.com'
+
+    licenseName = 'The Apache Software License, Version 2.0'
+    licenseUrl = 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+    allLicenses = ["Apache-2.0"]
+}
+
+apply plugin: 'com.android.library'
+apply plugin: 'maven'
+apply plugin: 'com.jfrog.bintray'
+
 apply plugin: 'com.android.library'
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
+
+apply plugin: 'org.jetbrains.dokka-android'
+
 android {
     compileSdkVersion 28
 
@@ -25,11 +67,10 @@ android {
         sourceCompatibility = 1.8
         targetCompatibility = 1.8
     }
-
 }
 
 dependencies {
-    implementation fileTree(dir: 'libs', include: ['*.jar'])
+    implementation fileTree(include: ['*.jar'], dir: 'libs')
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
     implementation 'androidx.appcompat:appcompat:1.0.2'
     implementation 'androidx.core:core-ktx:1.0.2'
@@ -39,3 +80,49 @@ dependencies {
     androidTestImplementation 'androidx.test:runner:1.2.0'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
 }
+
+def version = '1.0.0'
+def localReleaseDest = "${buildDir}/release/${version}"
+uploadArchives {
+    repositories.mavenDeployer {
+        pom.groupId = publishedGroupId
+        pom.artifactId = artifact
+        pom.version = libraryVersion
+        repository(url: "file://${localReleaseDest}")
+    }
+}
+
+task dokkaJavadoc(type: org.jetbrains.dokka.gradle.DokkaTask) {
+    outputFormat = 'javadoc'
+    outputDirectory = "$buildDir/javadoc"
+}
+
+task packageJavadoc(type: Jar, dependsOn: dokkaJavadoc) {
+    classifier = 'javadoc'
+    from "$buildDir/dokkaJavadoc"
+}
+
+task androidSourcesJar(type: Jar) {
+    classifier = 'sources'
+    from android.sourceSets.main.java.srcDirs
+}
+
+artifacts {
+    archives androidSourcesJar
+    archives packageJavadoc
+}
+task zipRelease(type: Zip) {
+    from localReleaseDest
+    destinationDir buildDir
+    archiveName "kpref-release-${version}.zip"
+}
+
+task generateRelease {
+    doLast {
+        println "Release ${version} can be found at ${localReleaseDest}/"
+        println "Release ${version} zipped can be found ${buildDir}/release-${version}.zip"
+    }
+}
+
+generateRelease.dependsOn(uploadArchives)
+generateRelease.dependsOn(zipRelease)
