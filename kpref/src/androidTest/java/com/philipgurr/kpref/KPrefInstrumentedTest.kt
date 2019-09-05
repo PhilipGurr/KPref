@@ -15,7 +15,7 @@ import org.junit.Assert.*
  * See [testing documentation](http://d.android.com/tools/testing).
  */
 @RunWith(AndroidJUnit4::class)
-class ExampleInstrumentedTest : ContextProvider {
+class KPrefInstrumentedTest : ContextProvider {
     override val context: Context = InstrumentationRegistry.getInstrumentation().targetContext
 
     // Preferences for String
