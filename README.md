@@ -55,8 +55,15 @@ or data classes and arbitrary objects:
 Non-primitives get serialized and saved in a String preference using [Gson](https://github.com/google/gson). When reading from the
 variable, the string gets deserialized to an object of the same type as the provided default value will be created.
 
+You can also generate a default value by using a lambda:
+```kotlin
+    var lastStart by SharedPreference("last_started") {
+        Calendar.getInstance().timeInMillis
+    }
+```
+
 ### editPreferences
-You can also use the extension function `editPreferences` on any Context and pass a function that gets invoked on the corresponding
+You can use the method `editPreferences` on a Context object and pass a function that gets invoked on the corresponding
 `SharedPreferences.Editor`:
 
 ```kotlin
