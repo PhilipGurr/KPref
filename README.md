@@ -46,11 +46,9 @@ or data classes and arbitrary objects using the built-in [Gson](https://github.c
 ```kotlin
     val userPref by SharedPreference("user_pref", GsonConverter(User::class), User("Default", "User", 0))
     
-    data class User(
-        val name: String,
-        val surname: String,
-        val age: Int
-    )
+    data class User(@SerializedName("surname") val surname: String,
+                    @SerializedName("name") val name: String,
+                    @SerializedName("age") val age: Int)
 ```
 The values get converted and saved in the Preference using the specified `PrefTypeConverter`. You can create your own converter if necessary. Note that in this case you have to implement the logic for writing and reading yourself using the provided `SharePreferences` object.
 
